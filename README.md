@@ -6,6 +6,11 @@
 
 Use Python 3.11 and run these commands from the directory containing the `ensnarlment_utils/` folder. If you downloaded a ZIP, extract it first.
 
+The workflow requires two packages for the network and linkage calculations. The install command below includes both.
+
+- **SnarlPy** computes cycle bases, directed edge–cycle matrices, and Gauss linking numbers. [SnarlPy 0.0.1 on PyPI](https://pypi.org/project/snarlpy/0.0.1/)
+- **Kirchhoff** wraps embedded graphs as dual circuits and provides network plotting. [Kirchhoff 0.2.7 on PyPI](https://pypi.org/project/kirchhoff/0.2.7/)
+
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
@@ -22,14 +27,14 @@ On Windows, create the environment with `py -3.11 -m venv .venv` and activate it
 Construct a Hopf link between polygonal loops with five and seven edges. The operator has shape `(5, 7)` and rank one. Its only nonzero singular value is $1/\sqrt{35} \approx 0.169031$.
 
 ```python
-from ensnarlment_utils.compute_ensnarlment import compute_ensnarlment
-from ensnarlment_utils.network_generation import create_hopf_link
-from ensnarlment_utils.spectral_analysis import compute_svd
+import ensnarlment_utils.compute_ensnarlment as ce
+import ensnarlment_utils.network_generation as ng
+import ensnarlment_utils.spectral_analysis as sa
 
-circuit = create_hopf_link(n_edges=(5, 7))
-result = compute_ensnarlment(circuit, cycle_basis_type="minimum", verbose=False)
+circuit = ng.create_hopf_link(n_edges=(5, 7))
+result = ce.compute_ensnarlment(circuit, cycle_basis_type="minimum", verbose=False)
 operator = result["ensnarlment_operator"]
-spectrum = compute_svd(operator)
+spectrum = sa.compute_svd(operator)
 
 print(operator.shape)                       # (5, 7)
 print(spectrum["rank"])                     # 1
@@ -41,22 +46,20 @@ The construction result includes the two cycle bases, the directed edge-by-cycle
 ### Visualize the principal singular subspace
 
 ```python
-from ensnarlment_utils.network_visualization import plot_degenerate_singular_subspace
+import ensnarlment_utils.network_visualization as nv
 
-fig = plot_degenerate_singular_subspace(circuit, operator, verbose=False)
-fig.write_html("hopf_link.html")
+fig = nv.plot_degenerate_singular_subspace(circuit, operator, verbose=False)
+fig.show()
 ```
 
 The plot colors each edge by the sum of squared singular-vector components in the principal subspace. When plotting, use the circuit’s native edge order. If you supplied custom edge orders or used `use_isomorphism=True`, align the operator or mesh matrices to the circuit’s edge order first.
 
-To export PDF and HTML together with `export_network_plot`, install `kaleido==0.2.1` with the Plotly version above. [Kaleido 0.2.1](https://pypi.org/project/kaleido/0.2.1/)
-
 ### Cut edges to reduce linkage rank
 
 ```python
-from ensnarlment_utils.edge_cutting import cut_with_recomputed_svd
+import ensnarlment_utils.edge_cutting as ec
 
-cuts = cut_with_recomputed_svd(
+cuts = ec.cut_with_recomputed_svd(
     M1_dir=result["M1_dir"],
     M2_dir=result["M2_dir"],
     lk_mat=result["linkage_matrix"],
@@ -84,4 +87,4 @@ This routine selects edges in the first network and recomputes the residual SVD 
 
 ## Citation
 
-If you use this code, cite *STEM: A Spectral Theory of Ensnarlment Measures* and the version of the software release used in your analysis. The module uses [SnarlPy](https://pypi.org/project/snarlpy/) for cycle and linkage calculations and [Kirchhoff](https://pypi.org/project/kirchhoff/) for circuit construction and network visualization. For the original framework, see Kramer and Modes, [*Ensnarled: Topological linkage of spatially embedded network pairs*](https://doi.org/10.1103/PhysRevResearch.5.033203).
+If you use this code, cite *STEM: A Spectral Theory of Ensnarlment Measures* and the version of the software release used in your analysis. For the original framework, see Kramer and Modes, [*Ensnarled: Topological linkage of spatially embedded network pairs*](https://doi.org/10.1103/PhysRevResearch.5.033203).
