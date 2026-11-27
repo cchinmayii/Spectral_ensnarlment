@@ -1,10 +1,10 @@
-# Ensnarlment utilities
+# Spectral_ensnarlment
 
-`ensnarlment_utils` is the Python module accompanying *STEM: A Spectral Theory of Ensnarlment Measures*. It constructs the ensnarlment operator for pairs of spatially embedded networks, analyzes its singular spectrum, visualizes edge participation in singular subspaces, and identifies edge cuts that reduce the rank of the remaining linkage.
+`spectral_ensnarlment` is the Python module accompanying *STEM: A Spectral Theory of Ensnarlment Measures*. It constructs the ensnarlment operator for pairs of spatially embedded networks, analyzes its singular spectrum, visualizes edge participation in singular subspaces, and identifies edge cuts that reduce the rank of the remaining linkage.
 
 ## Setup
 
-Use Python 3.11 and run these commands from the directory containing the `ensnarlment_utils/` folder. If you downloaded a ZIP, extract it first.
+Use Python 3.11 and run these commands from the directory containing the `spectral_ensnarlment/` folder. If you downloaded a ZIP, extract it first.
 
 The workflow requires two packages for the network and linkage calculations. The install command below includes both.
 
@@ -27,9 +27,9 @@ On Windows, create the environment with `py -3.11 -m venv .venv` and activate it
 Construct a Hopf link between polygonal loops with five and seven edges. The operator has shape `(5, 7)` and rank one. Its only nonzero singular value is $1/\sqrt{35} \approx 0.169031$.
 
 ```python
-import ensnarlment_utils.compute_ensnarlment as ce
-import ensnarlment_utils.network_generation as ng
-import ensnarlment_utils.spectral_analysis as sa
+import spectral_ensnarlment.compute_ensnarlment as ce
+import spectral_ensnarlment.network_generation as ng
+import spectral_ensnarlment.spectral_analysis as sa
 
 circuit = ng.create_hopf_link(n_edges=(5, 7))
 result = ce.compute_ensnarlment(circuit, cycle_basis_type="minimum", verbose=False)
@@ -46,7 +46,7 @@ The construction result includes the two cycle bases, the directed edge-by-cycle
 ### Visualize the principal singular subspace
 
 ```python
-import ensnarlment_utils.network_visualization as nv
+import spectral_ensnarlment.network_visualization as nv
 
 fig = nv.plot_degenerate_singular_subspace(circuit, operator, verbose=False)
 fig.show()
@@ -57,7 +57,7 @@ The plot colors each edge by the sum of squared singular-vector components in th
 ### Cut edges to reduce linkage rank
 
 ```python
-import ensnarlment_utils.edge_cutting as ec
+import spectral_ensnarlment.edge_cutting as ec
 
 cuts = ec.cut_with_recomputed_svd(
     M1_dir=result["M1_dir"],
